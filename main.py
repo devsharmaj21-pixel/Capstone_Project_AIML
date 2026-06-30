@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression, Ridge, LogisticRegression
 from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix, classification_report, roc_curve, auc, precision_recall_fscore_support
 from sklearn.utils import resample
 
-# Professional Logging Configuration
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
@@ -46,7 +46,7 @@ if not os.path.exists(RAW_DATA_PATH):
     duplicated_slices = raw_df.iloc[500:550]
     raw_df = pd.concat([raw_df, duplicated_slices], ignore_index=True)
     
-    # Save the prepared raw dataset
+    
     raw_df.to_csv(RAW_DATA_PATH, index=False)
     logger.info(f"Official target dataset successfully written as local resource: '{RAW_DATA_PATH}'")
 
@@ -76,7 +76,7 @@ print(null_report_df)
 high_null_cols = null_percentages[null_percentages > 20].index.tolist()
 print(f"\nColumns exceeding a 20% null threshold: {high_null_cols}")
 
-# Impute numeric columns under 20% nulls with median
+
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 for col in numeric_cols:
     if null_percentages[col] <= 20 and null_counts[col] > 0:
@@ -105,11 +105,11 @@ print(pd.DataFrame({'Null % Before Drop': null_pct_before_drop, 'Null % After Dr
 logger.info("--- TASK 4: RECASTING INVALID SCHEMAS ---")
 memory_bytes_before = df.memory_usage(deep=True).sum()
 
-# Convert dirty text objects back to numeric
+
 df['Inferred_Numeric_Object'] = pd.to_numeric(df['Inferred_Numeric_Object'], errors='coerce')
 df['Inferred_Numeric_Object'].fillna(df['Inferred_Numeric_Object'].median(), inplace=True)
 
-# Convert repetitive strings to category dtypes
+
 df['Account_Segment_Str'] = df['Account_Segment_Str'].astype('category')
 
 memory_bytes_after = df.memory_usage(deep=True).sum()
@@ -166,7 +166,7 @@ axes[1].set_title("2. Bar Chart: Mean MedInc across Account Segments")
 axes[1].set_xlabel("Account Segment Categories")
 axes[1].set_ylabel("Mean MedInc")
 
-# 3. Histogram (Bins=20)
+# 3. Histogram 
 sns.histplot(df[highest_skew_col], bins=20, kde=True, ax=axes[2], color='crimson')
 axes[2].set_title(f"3. Histogram: 20-Bin Density Grid for Skewed Target ('{highest_skew_col}')")
 
@@ -194,7 +194,7 @@ logger.info("--- TASK 8 & SUB-TASKS PIPELINE ---")
 pearson_corr = current_numeric_df.corr(method='pearson')
 spearman_corr = current_numeric_df.corr(method='spearman')
 
-# Heatmap generationP
+# Heatmap 
 plt.figure(figsize=(10, 8))
 sns.heatmap(pearson_corr, annot=True, fmt=".2f", cmap='coolwarm', square=True)
 plt.title("Pearson Linear Correlation Matrix")
@@ -202,14 +202,14 @@ plt.tight_layout()
 plt.savefig("pearson_correlation_heatmap.png")
 plt.close()
 
-# Sub-task a: Imputation check using Side-by-Side values
+
 print("\n--- SUB-TASK A: PRE-IMPUTATION DATA VALUES ---")
 sorted_features = df.select_dtypes(include=[np.number]).skew().abs().sort_values(ascending=False)
 top_2_skewed = sorted_features.index[:2].tolist()
 for col in top_2_skewed:
     print(f"Column '{col}' -> Mean: {df[col].mean():.4f} | Median: {df[col].median():.4f}")
 
-# Sub-task b: Spearman Rank vs Pearson difference
+
 print("\n--- SUB-TASK B: TOP SPEARMAN VS PEARSON DIFFERENCES ---")
 import os
 import sys
@@ -221,7 +221,7 @@ import seaborn as sns
 
 from sklearn.datasets import fetch_california_housing
 
-# Logging Template Setup
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
@@ -234,25 +234,25 @@ logger = logging.getLogger(__name__)
 # =====================================================================
 logger.info("--- TASK 1: INITIAL DATA LOADING VIA DYNAMIC FRAMEWORK ---")
 
-# Direct live extraction to bypass any local corrupted file conflicts
+
 raw_bunch = fetch_california_housing(as_frame=True)
 df = raw_bunch.frame
 
-# Enforcing explicit fallback safety columns layout strings
+
 df.columns = ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude', 'MedHouseValue']
 
-# 1. Injecting a repetitive categorical string column (Task 4)
+
 np.random.seed(42)
 df['Account_Segment_Str'] = np.random.choice(['Premium_Tier', 'Standard_Tier', 'Basic_Tier'], size=len(df))
 
-# 2. Injecting a numeric column stored as dirty string object (Task 4)
+
 df['Inferred_Numeric_Object'] = [str(round(x, 2)) if i % 20 != 0 else "ERROR_VAL" for i, x in enumerate(df['AveRooms'])]
 
-# 3. Injecting random missing frames under 20% to validate Null Analysis (Task 2)
-df.iloc[10:150, 0] = np.nan   # MedInc nulls
-df.iloc[200:400, 1] = np.nan  # HouseAge nulls
 
-# 4. Injecting duplicate rows to satisfy Duplicate removal rules (Task 3)
+df.iloc[10:150, 0] = np.nan   
+df.iloc[200:400, 1] = np.nan 
+
+
 duplicated_slices = df.iloc[500:550]
 df = pd.concat([df, duplicated_slices], ignore_index=True)
 
@@ -277,7 +277,7 @@ print(null_report_df)
 high_null_cols = null_percentages[null_percentages > 20].index.tolist()
 print(f"\nColumns exceeding a 20% null threshold: {high_null_cols}")
 
-# Impute numeric columns under 20% nulls with median location
+
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 for col in numeric_cols:
     if null_percentages[col] <= 20 and null_counts[col] > 0:
@@ -308,7 +308,7 @@ print(pd.DataFrame({'Null % Before Drop': null_pct_before_drop, 'Null % After Dr
 logger.info("--- TASK 4: RECASTING INVALID SCHEMAS ---")
 memory_bytes_before = df.memory_usage(deep=True).sum()
 
-# Convert dirty text objects back to numeric
+
 df['Inferred_Numeric_Object'] = pd.to_numeric(df['Inferred_Numeric_Object'], errors='coerce')
 df['Inferred_Numeric_Object'].fillna(df['Inferred_Numeric_Object'].median(), inplace=True)
 
@@ -342,7 +342,7 @@ print(f"\nTarget Attribute with Highest Absolute Skewness: '{highest_skew_col}' 
 # TASK 6: OUTLIER DETECTION WITH INTERQUARTILE RANGE (IQR)
 # =====================================================================
 logger.info("--- TASK 6: OUTLIER TRACKING LAYOUT ---")
-# Using precise numerical position indices to secure execution safety
+
 col1_name = current_numeric_df.columns[0]
 col2_name = current_numeric_df.columns[1]
 
@@ -361,7 +361,7 @@ logger.info("--- TASK 7: PLOTS RENDERING ENGINE ---")
 fig, axes = plt.subplots(3, 2, figsize=(15, 18))
 axes = axes.flatten()  # Standardizing matrix shape bounds into 1D arrays
 
-# Fetch names dynamically via location mapping matrices
+
 line_col = current_numeric_df.columns[0]
 scatter_x = current_numeric_df.columns[0]
 scatter_y = current_numeric_df.columns[-1]  # Safely targets target continuous matrix element
@@ -374,18 +374,18 @@ axes[0].set_title(f"1. Line Plot: {line_col} values across row index subset")
 axes[0].set_xlabel("Row Index")
 axes[0].set_ylabel(f"{line_col} Range")
 
-# 2. Bar Chart
+# 2.  Bar Chart
 bar_aggregated = df.groupby(cat_col, observed=False)[line_col].mean()
 axes[1].bar(bar_aggregated.index.astype(str), bar_aggregated.values, color='darkorange', edgecolor='black')
 axes[1].set_title(f"2. Bar Chart: Mean {line_col} across Account Segments")
 axes[1].set_xlabel("Account Segment Categories")
 axes[1].set_ylabel(f"Mean {line_col}")
 
-# 3. Histogram (Bins configured explicitly to 20)
+# 3. Histogram
 sns.histplot(data=df, x=highest_skew_col, bins=20, kde=True, ax=axes[2], color='crimson')
 axes[2].set_title(f"3. Histogram: 20-Bin Density Grid for Skewed Target ('{highest_skew_col}')")
 
-# 4. Scatter Plot (Bypassing continuous column lookup using location keys)
+# 4. Scatter Plot
 sns.scatterplot(data=df.iloc[:1000], x=scatter_x, y=scatter_y, ax=axes[3], color='purple', alpha=0.5)
 axes[3].set_title(f"4. Scatter Plot: {scatter_x} vs {scatter_y}")
 axes[3].set_xlabel(scatter_x)
@@ -395,7 +395,7 @@ axes[3].set_ylabel(scatter_y)
 sns.boxplot(data=df, x=cat_col, y=box_y, ax=axes[4], palette='Set2')
 axes[4].set_title(f"5. Box Plot: {box_y} Spread Across Account Segments")
 
-# Remove unused quadrant allocation panel safely
+
 fig.delaxes(axes[5])
 
 plt.tight_layout()
@@ -412,7 +412,7 @@ logger.info("--- TASK 8 & SUB-TASKS PIPELINE ---")
 pearson_corr = current_numeric_df.corr(method='pearson')
 spearman_corr = current_numeric_df.corr(method='spearman')
 
-# Heatmap generation
+# Heatmap
 plt.figure(figsize=(10, 8))
 sns.heatmap(pearson_corr, annot=True, fmt=".2f", cmap='coolwarm', square=True)
 plt.title("Pearson Linear Correlation Matrix")
@@ -421,14 +421,14 @@ plt.savefig("pearson_correlation_heatmap.png")
 plt.close()
 print("Pearson Matrix Correlation Map saved successfully.")
 
-# Sub-task a: Imputation check using Side-by-Side values
+
 print("\n--- SUB-TASK A: PRE-IMPUTATION DATA VALUES ---")
 sorted_features = df.select_dtypes(include=[np.number]).skew().abs().sort_values(ascending=False)
 top_2_skewed = sorted_features.index[:2].tolist()
 for col in top_2_skewed:
     print(f"Column '{col}' -> Mean: {df[col].mean():.4f} | Median: {df[col].median():.4f}")
 
-# Sub-task b: Spearman Rank vs Pearson difference
+
 print("\n--- SUB-TASK B: TOP SPEARMAN VS PEARSON DIFFERENCES ---")
 diff_matrix = (spearman_corr - pearson_corr).abs()
 np.fill_diagonal(diff_matrix.values, 0)
